@@ -7,4 +7,8 @@ var app = express();
 app.get('/wx', function (req, res) {
     wechatApp.auth(req, res)
 });
+app.get('/', function (req, res) {
+    res.send('hello word')
+});
+
 app.listen(3002)
