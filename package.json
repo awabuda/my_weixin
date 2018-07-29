@@ -1,0 +1,27 @@
+{
+  "name": "my_weixin",
+  "version": "1.0.0",
+  "description": "微信认证",
+  "main": "wxService.js",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "express": "^4.16.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/awabuda/my_weixin.git"
+  },
+  "keywords": [
+    "微信认证"
+  ],
+  "author": "cpt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/awabuda/my_weixin/issues"
+  },
+  "homepage": "https://github.com/awabuda/my_weixin#readme"
+}
