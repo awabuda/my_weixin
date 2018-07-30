@@ -13,10 +13,15 @@
 
 ###4云服务搭建入门级别网站    
 [传送门](https://www.jdcloud.com/help/detail/572/isCatalog/1)    
-####5 技术选型     
+###5 技术选型     
 ```
-	node express起web服务 
-	nginx通过监听80端口代理转发到相应的ip
+	服务 : node express 以及其他中间件 
+	前端: vue
+	nginx通过监听80端口代理转发到相应的端口
+	pm2 管理node进程	
 ```
+[node中文网](http://nodejs.cn/api/)
+[vue中文网](https://cn.vuejs.org/v2/guide/)
+[pm2入门指南](https://pm2.io/doc/en/runtime/quick-start/?utm_source=pm2&utm_medium=website&utm_campaign=rebranding)
 
 
