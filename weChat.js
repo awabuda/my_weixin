@@ -28,9 +28,19 @@ WeChat.prototype.auth = function (req, res) {
 
     //4.开发者获得加密后的字符串可与signature对比，标识该请求来源于微信
     if (resultCode === signature) {
-        res.send(echostr);
+        res.send({
+            error:false,
+            errorMessage:'',
+            signature: signature,
+            timestamp: timestamp,
+            nonce: nonce,
+            echostr: echostr
+        });
     } else {
-        res.send('mismatch');
+        res.send({
+            error:true,
+            errorMessage:'签名校验失败'
+        });
     }
 }
 
