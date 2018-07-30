@@ -28,6 +28,14 @@ WeChat.prototype.auth = function (req, res) {
 
     //4.开发者获得加密后的字符串可与signature对比，标识该请求来源于微信
     if (resultCode === signature) {
+        console.log({
+                    error: false,
+                    errorMessage: '',
+                    signature: signature,
+                    timestamp: timestamp,
+                    nonce: nonce,
+                    echostr: echostr
+        });
         res.send({
             error:false,
             errorMessage:'',
