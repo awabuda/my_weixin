@@ -4,6 +4,8 @@ config = require('./config');
 
 var wechatApp = new wechat(config); //实例wechat 模块
 var app = express();
+app.use(express.static(__dirname));
+
 app.get('/wx', function (req, res) {
     wechatApp.auth(req, res)
 });
