@@ -65,21 +65,22 @@ weMethod.prototype.getAccessToken = function () {
         var currentTime = new Date().getTime();
         //判断 本地存储的 access_token 是否有效
         var accessTokenJson = JSON.parse(fs.readFileSync(path.resolve(__dirname + '/accesstoken.json'), 'utf-8') || "{}");
-        if (accessTokenJson.access_token === "" || accessTokenJson.expires_time < currentTime) {
+        console.log(accessTokenJson);
+        if (!accessTokenJson.access_token  || accessTokenJson.expires_time < currentTime) {
             console.log('token过期重新请求')
             request({
                     url: _this.config.apiDomain + _this.config.apiURL.all_access_token,
                     timeout: '10000',
                     method: 'GET',
                 },
-                function (data) {
+                function (req,body,data) {
                     var result = JSON.parse(data);
                     console.log('token,重新请求成功',result);
                     if (data.indexOf("errcode") < 0) {
                         accessTokenJson.access_token = result.access_token;
                         accessTokenJson.expires_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
                         //更新本地存储的
-                        fs.writeFile('./wechat/access_token.json', JSON.stringify(accessTokenJson));
+                        fs.writeFileSync(path.resolve(__dirname + '/accesstoken.json'), JSON.stringify(accessTokenJson));
                         //将获取后的 access_token 返回
                         resolve(accessTokenJson);
                     } else {
@@ -132,13 +133,14 @@ weMethod.prototype.signature = function (req, res) {
                         method: 'GET',
                     },
                     function (error, resp, json) {
+                        var result = JSON.parse(json);
                         if (!error && resp.statusCode == 200) {
-                            var result = JSON.parse(json);
                             accessTokenJson.jsapi_ticket = result.ticket;
                             accessTokenJson.jsapi_ticket_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
                             //更新本地存储的
-                            fs.writeFile('./wechat/access_token.json', JSON.stringify(accessTokenJson));
+                            fs.writeFileSync(path.resolve(__dirname + '/accesstoken.json'), JSON.stringify(accessTokenJson));
                             res.send({
+                                appid: _this.config.appID,
                                 noncestr: noncestr,
                                 timestamp: timestamp,
                                 url: url,
@@ -146,11 +148,11 @@ weMethod.prototype.signature = function (req, res) {
                                 signature: sha1('jsapi_ticket=' + result.ticket + '&noncestr=' + noncestr + '&timestamp=' + timestamp + '&url=' + url)
                             })
                         } else {
-                            res.send(json);
+                            res.send(result);
                         }
                     })
             } else {
-                res.send(res);
+                res.send(data);
             }
         })
     }
@@ -167,15 +169,13 @@ weMethod.prototype.get_user_token = function (code) {
             method: 'GET',
         },
         function (error, resp, res) {
-            console.log(res);
-            if (res.openid) {
-                resolve(res)
+            var data = JSON.parse(res);
+            if (data.openid) {
+                resolve(data)
             } else {
-                console.log(typeof res);
-                
                 resolve(Object.assign({
                     'error': 'true'
-                }, JSON.parse(res)))
+                }, data))
             }
         })
     })
@@ -187,16 +187,20 @@ weMethod.prototype.userInfo = function (req, res) {
     console.log('通过code拿用户的信息')
     if (code) {
         _this.get_user_token(code).then(data => {
-            console.log('用户的信息', data)
+            console.log(typeof data)
+            console.log(data.access_token,data);
+            console.log(data.openid);
             if (!data.error) {
                 request({
                     url: _this.config.apiDomain + _this.config.apiURL.userinfo_api.replace('${ACCESS_TOKEN}', data.access_token).replace('${openid}', data.openid),
                     timeout: '10000',
                     method: 'GET',
-                }, function (err,resq,data) {
-                    res.send(data);
+                }, function (err,resq,json) {
+                    var d = JSON.parse(json);
+                    res.send(d);
                 })
             } else {
+                console.log('1111')
                 res.send(data);
             }
         })

@@ -26,7 +26,6 @@ app.get('/userInfo', function (req, res) { // 入参 code
     wxChat.userInfo(req,res);
 });
 app.get('/signature', function (req,res) {
-    console.log('获取签名',req)
     wxChat.signature(req, res)
 })
 
