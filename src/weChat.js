@@ -41,19 +41,19 @@ weMethod.prototype.auth = function (req, res) {
             nonce: nonce,
             echostr: echostr
         });
-        res.send({
-            error: false,
-            errorMessage: '',
-            signature: signature,
-            timestamp: timestamp,
-            nonce: nonce,
-            echostr: echostr
-        });
+        // res.send({
+        //     error: false,
+        //     errorMessage: '',
+        //     signature: signature,
+        //     timestamp: timestamp,
+        //     nonce: nonce,
+        //     echostr: echostr
+        // });
     } else {
-        res.send({
-            error: true,
-            errorMessage: '签名校验失败'
-        });
+        // res.send({
+        //     error: true,
+        //     errorMessage: '签名校验失败'
+        // });
     }
 }
 //获取接口的凭证 任何微调微信的接口都需要此凭证
