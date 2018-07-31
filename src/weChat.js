@@ -41,7 +41,14 @@ weMethod.prototype.auth = function (req, res) {
             nonce: nonce,
             echostr: echostr
         });
-        res.send(echostr);
+        res.send({
+            error: false,
+            errorMessage: '',
+            signature: signature,
+            timestamp: timestamp,
+            nonce: nonce,
+            echostr: echostr
+        });
     } else {
         // res.send({
         //     error: true,
