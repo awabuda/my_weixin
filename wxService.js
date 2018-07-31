@@ -1,27 +1,37 @@
 const express = require('express'),
-wechat = require('../src/weChat'),
+weMethod = require('./src/weChat'),
 request = require('request'),
-config = require('../src/config');
+config = require('./src/config');
 
-var wechatApp = new wechat(config); //实例wechat 模块
+var wxChat = new weMethod(config); //实例wechat 模块
 var app = express();
+// 允许跨域
+app.all('*', function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
+    res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+
+    if (req.method == 'OPTIONS') {
+        res.send(200);
+    } else {
+        next();
+    }
+});
 
 app.get('/wx', function (req, res) {
-    wechatApp.auth(req, res)
+    wxChat.auth(req, res)
 });
-app.get('/get_token', function (req, res) {
-    var code = req.query.code
-    if (code) {
-        
-    }else {
-       res.send({
-           error:true,
-           errorMessage:'请正确填写code入参'
-       })
-    }
+app.get('/userInfo', function (req, res) { // 入参 code
+    wxChat.userInfo(req,res);
+});
+app.get('/signature', function (req,res) {
+    wxChat.signature(req, res)
 })
+
 app.get('/', function (req, res) {
     res.send('hello word')
 });
 
-app.listen(3002)
+app.listen(3002, function (err) {
+    console.log(err);
+})
