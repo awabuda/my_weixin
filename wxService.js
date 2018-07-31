@@ -17,12 +17,13 @@ app.all('*', function (req, res, next) {
         next();
     }
 });
-
+app.get('/ww', function () {
+    
+})
 app.get('/wx', function (req, res) {
     wxChat.auth(req, res)
 });
 app.get('/userInfo', function (req, res) { // 入参 code
-    // console.log('用户信息', req)
     wxChat.userInfo(req,res);
 });
 app.get('/signature', function (req,res) {
