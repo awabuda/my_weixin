@@ -17,18 +17,7 @@ app.all('*', function (req, res, next) {
         next();
     }
 });// webhook 
-app.get('/ww', function (req,res) {
-    var obj = {
-        error: false,
-        errorMessage: '',
-        signature: req.query.signature,
-        timestamp: req.query.timestamp,
-        nonce: req.query.nonce,
-        echostr: req.query.echostr
-    }
-    console.log('wwwwww-',obj);
-    res.send(obj)
-})
+
 app.get('/wx', function (req, res) {
     wxChat.auth(req, res)
 });
