@@ -27,7 +27,7 @@ app.get('/ww', function (req,res) {
         echostr: req.query.echostr
     }
     console.log('wwwwww-',obj);
-    res.send(req.query.echostr)
+    res.send(obj)
 })
 app.get('/wx', function (req, res) {
     wxChat.auth(req, res)
