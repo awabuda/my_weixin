@@ -22,13 +22,16 @@ app.get('/wx', function (req, res) {
     wxChat.auth(req, res)
 });
 app.get('/userInfo', function (req, res) { // 入参 code
+    // console.log('用户信息', req)
     wxChat.userInfo(req,res);
 });
 app.get('/signature', function (req,res) {
+    console.log('获取签名',req)
     wxChat.signature(req, res)
 })
 
 app.get('/', function (req, res) {
+    console.log('更目录', req.query.code)
     res.send('hello word')
 });
 

@@ -1,9 +1,9 @@
-const crypto = require('crypto'); //引入加密模块
-const Promise = require('promise');
-const fs = require('fs');
-const path = require('path');
-const request = require('request');
-const sha1 = require('sha1');
+var crypto = require('crypto'); //引入加密模块
+var Promise = require('promise');
+var fs = require('fs');
+var path = require('path');
+var request = require('request');
+var sha1 = require('sha1');
 
 //构建 weMethod 对象 即 js中 函数就是对象
 var weMethod = function (config) {
@@ -59,19 +59,22 @@ weMethod.prototype.auth = function (req, res) {
 //获取接口的凭证 任何微调微信的接口都需要此凭证
 weMethod.prototype.getAccessToken = function () {
     var _this = this;
+    console.log('开始获取token')
     return new Promise(function (resolve, rej) {
         //获取当前时间 
         var currentTime = new Date().getTime();
         //判断 本地存储的 access_token 是否有效
         var accessTokenJson = JSON.parse(fs.readFileSync(path.resolve(__dirname + '/accesstoken.json'), 'utf-8') || "{}");
         if (accessTokenJson.access_token === "" || accessTokenJson.expires_time < currentTime) {
+            console.log('token过期重新请求')
             request({
-                    url: _this.config.apiDomain + _this.config.all_access_token,
+                    url: _this.config.apiDomain + _this.config.apiURL.all_access_token,
                     timeout: '10000',
                     method: 'GET',
                 },
                 function (data) {
                     var result = JSON.parse(data);
+                    console.log('token,重新请求成功',result);
                     if (data.indexOf("errcode") < 0) {
                         accessTokenJson.access_token = result.access_token;
                         accessTokenJson.expires_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
@@ -85,6 +88,7 @@ weMethod.prototype.getAccessToken = function () {
                     }
                 })
         } else {
+            console.log('取自缓存的token')
             //将本地存储的 access_token 返回
             resolve(accessTokenJson);
         }
@@ -92,6 +96,7 @@ weMethod.prototype.getAccessToken = function () {
 }
 // 获取签名
 weMethod.prototype.signature = function (req, res) {
+    console.log('开始获取签名计算')
     var _this = this;
     var noncestr = this.config.noncestr;
     var timestamp = Math.floor(Date.now() / 1000);
@@ -107,6 +112,7 @@ weMethod.prototype.signature = function (req, res) {
     }
     if (accessTokenJson && accessTokenJson.jsapi_ticket && accessTokenJson.jsapi_ticket_time < currentTime) {
         jsapi_ticket = accessTokenJson.jsapi_ticket;
+        console.log('缓存中含有jsapi_ticket')
         res.send({
             noncestr: noncestr,
             timestamp: timestamp,
@@ -115,10 +121,13 @@ weMethod.prototype.signature = function (req, res) {
             signature: sha1('jsapi_ticket=' + jsapi_ticket + '&noncestr=' + noncestr + '&timestamp=' + timestamp + '&url=' + url)
         })
     } else {
+        console.log('缓存中含没有jsapi_ticket')
+
         _this.getAccessToken().then(data => {
+            console.log('重新获取jsapi_ticket')
             if (data.access_token) {
                 request({
-                        url: _this.config.apiDomain + _this.config.jsapi_ticket.replace('${ACCESS_TOKEN}', data.access_token),
+                        url: _this.config.apiDomain + _this.config.apiURL.jsapi_ticket.replace('${ACCESS_TOKEN}', data.access_token),
                         timeout: '10000',
                         method: 'GET',
                     },
@@ -149,19 +158,24 @@ weMethod.prototype.signature = function (req, res) {
 // 获取用户的token;
 weMethod.prototype.get_user_token = function (code) {
     var _this = this;
+    console.log('开始获取用户的token')
     return new Promise(function (resolve, reject) {
+        console.log(_this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code));
         request({
-            url: _this.config.apiDomain + _this.config.user_access_token_api.replace('${code}', code),
+            url: _this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code),
             timeout: '10000',
             method: 'GET',
-        }, function (res) {
+        },
+        function (error, resp, res) {
+            console.log(res);
             if (res.openid) {
                 resolve(res)
             } else {
-                resolve({
-                    error: true,
-                    errorCode: res.errcode
-                })
+                console.log(typeof res);
+                
+                resolve(Object.assign({
+                    'error': 'true'
+                }, JSON.parse(res)))
             }
         })
     })
@@ -170,14 +184,16 @@ weMethod.prototype.get_user_token = function (code) {
 weMethod.prototype.userInfo = function (req, res) {
     var _this = this;
     var code = req.query.code;
+    console.log('通过code拿用户的信息')
     if (code) {
         _this.get_user_token(code).then(data => {
+            console.log('用户的信息', data)
             if (!data.error) {
                 request({
-                    url: _this.config.apiDomain + _this.config.userinfo_api.replace('${ACCESS_TOKEN}', data.access_token).replace('${openid}', data.openid),
+                    url: _this.config.apiDomain + _this.config.apiURL.userinfo_api.replace('${ACCESS_TOKEN}', data.access_token).replace('${openid}', data.openid),
                     timeout: '10000',
                     method: 'GET',
-                }, function (data) {
+                }, function (err,resq,data) {
                     res.send(data);
                 })
             } else {
@@ -185,6 +201,7 @@ weMethod.prototype.userInfo = function (req, res) {
             }
         })
     } else {
+        console.log('code wuxiao')
         res.send({
             error: true,
             errorMessage: 'code 入参错误'
