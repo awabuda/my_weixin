@@ -21,7 +21,7 @@ weMethod.prototype.auth = function (req, res) {
         timestamp = req.query.timestamp, //时间戳
         nonce = req.query.nonce, //随机数
         echostr = req.query.echostr; //随机字符串
-
+    console.log('0000',req.query)
     //2.将token、timestamp、nonce三个参数进行字典序排序
     var array = [this.token, timestamp, nonce];
     array.sort();
@@ -33,7 +33,7 @@ weMethod.prototype.auth = function (req, res) {
 
     //4.开发者获得加密后的字符串可与signature对比，标识该请求来源于微信
     if (resultCode === signature) {
-        console.log({
+        console.log('11111',{
             error: false,
             errorMessage: '',
             signature: signature,
@@ -41,14 +41,14 @@ weMethod.prototype.auth = function (req, res) {
             nonce: nonce,
             echostr: echostr
         });
-        // res.send({
-        //     error: false,
-        //     errorMessage: '',
-        //     signature: signature,
-        //     timestamp: timestamp,
-        //     nonce: nonce,
-        //     echostr: echostr
-        // });
+        res.send({
+            error: false,
+            errorMessage: '',
+            signature: signature,
+            timestamp: timestamp,
+            nonce: nonce,
+            echostr: echostr
+        });
     } else {
         // res.send({
         //     error: true,

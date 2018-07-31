@@ -26,7 +26,7 @@ app.get('/ww', function (req,res) {
         nonce: req.query.nonce,
         echostr: req.query.echostr
     }
-    console.log(obj);
+    console.log('wwwwww-',obj);
     res.send(obj)
 })
 app.get('/wx', function (req, res) {
