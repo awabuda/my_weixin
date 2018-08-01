@@ -48,7 +48,7 @@ wx_boot.set('subscribe', {
         return info.is('event') && info.param.event === 'subscribe';
     },
     handler: function (info) {
-        return '欢迎订阅微信机器人';
+        return '欢迎订阅悟凌斋订阅号';
     }
 });
 
