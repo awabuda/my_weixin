@@ -29,13 +29,23 @@ app.get('/signature', function (req,res) {
     wxChat.signature(req, res)
 })
 app.post('/wx',function (req,res){
-    console.log('post---',req);
-    res.send('干啥啊')
+    console.log(res,req)
+    res.setEncoding('utf8');
+    var data = '';
+
+    res.on('data', function (chunk) {
+        console.log('11111-',chunk);
+        data += chunk;
+    });
+    res.on('end', function () {
+        console.log('22222-',data);
+    })
 })
 
 app.get('/', function (req, res) {
-    console.log('用户的code', req.query.code)
-    res.send('hello word')
+    res.on('data', function (data){
+
+    })
 });
 
 app.listen(3002, function (err) {
