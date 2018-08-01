@@ -36,6 +36,7 @@ weMethod.prototype.auth = function (req, res) {
 
         res.send(echostr);
     } else {
+        
     }
 }
 //获取接口的凭证 任何微调微信的接口都需要此凭证

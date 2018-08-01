@@ -27,12 +27,16 @@ app.get('/userInfo', function (req, res) { // 入参 code
 app.get('/signature', function (req,res) {
     wxChat.signature(req, res)
 })
+app.post('/wx',function (req,res){
+    console.log(req.body);
+    res.send('干啥啊')
+})
 
 app.get('/', function (req, res) {
-    console.log('更目录', req.query.code)
+    console.log('用户的code', req.query.code)
     res.send('hello word')
 });
 
 app.listen(3002, function (err) {
     console.log(err);
-})
+})  
