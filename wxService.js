@@ -19,6 +19,7 @@ app.all('*', function (req, res, next) {
 });// webhook 
 
 app.get('/wx', function (req, res) {
+    console.log('dsafdf--',req)
     wxChat.auth(req, res)
 });
 app.get('/userInfo', function (req, res) { // 入参 code
@@ -28,7 +29,7 @@ app.get('/signature', function (req,res) {
     wxChat.signature(req, res)
 })
 app.post('/wx',function (req,res){
-    console.log(req.body);
+    console.log('post---',req);
     res.send('干啥啊')
 })
 
