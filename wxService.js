@@ -2,6 +2,7 @@ const express = require('express'),
 weMethod = require('./src/weChat'),
 request = require('request'),
 config = require('./src/config');
+var wx_boot = require('weixin-robot');
 
 var wxChat = new weMethod(config); //实例wechat 模块
 var app = express();
@@ -28,24 +29,38 @@ app.get('/userInfo', function (req, res) { // 入参 code
 app.get('/signature', function (req,res) {
     wxChat.signature(req, res)
 })
-app.post('/wx',function (req,res){
-    console.log(res,req)
-    res.setEncoding('utf8');
-    var data = '';
+// app.post('/wx',function (req,res){
+//     console.log(res,req)
+//     res.setEncoding('utf8');
+//     var data = '';
 
-    res.on('data', function (chunk) {
-        console.log('11111-',chunk);
-        data += chunk;
-    });
-    res.on('end', function () {
-        console.log('22222-',data);
-    })
+//     res.on('data', function (chunk) {
+//         console.log('11111-',chunk);
+//         data += chunk;
+//     });
+//     res.on('end', function () {
+//         console.log('22222-',data);
+//     })
+// })
+wx_boot.set('hi','你好');
+wx_boot.set('subscribe', {
+    pattern: function (info) {
+        return info.is('event') && info.param.event === 'subscribe';
+    },
+    handler: function (info) {
+        return '欢迎订阅微信机器人';
+    }
+});
+
+wx_boot.set('test', {
+    pattern: /^test/i,
+    handler: function (info, next) {
+        next(null, 'roger that!')
+    }
 })
-
-app.get('/', function (req, res) {
-    res.on('data', function (data){
-
-    })
+wx_boot.watch(app, {
+    token: 'wechat',
+    path: '/wx'
 });
 
 app.listen(3002, function (err) {
