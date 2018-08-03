@@ -1,8 +1,9 @@
 const express = require('express'),
 weMethod = require('./src/weChat'),
 request = require('request'),
-config = require('./src/config');
-var wx_boot = require('weixin-robot');
+config = require('./src/config'),
+md5 = require('md5'),
+wx_boot = require('weixin-robot');
 
 var wxChat = new weMethod(config); //实例wechat 模块
 var app = express();
@@ -42,7 +43,6 @@ app.get('/signature', function (req,res) {
 //         console.log('22222-',data);
 //     })
 // })
-wx_boot.set('hi','你好');
 wx_boot.set('subscribe', {
     pattern: function (info) {
         return info.is('event') && info.param.event === 'subscribe';
@@ -52,17 +52,15 @@ wx_boot.set('subscribe', {
     }
 });
 
-wx_boot.set('test', {
-    pattern: /^test/i,
+wx_boot.set('cpt', {
+    pattern: /^*/g,
     handler: function (info, next) {
-        next(null, '设施啥!')
-    }
-});
-wx_boot.set('*', {
-    pattern: /^w*/i,
-    handler: function (info, next) {
-        console.log(info)
-        next(null,'干啥类')
+        var text = '抱歉尚未支持该格式内容'
+        var n = md5('87e003775ed48a3c' + new Date().getTime() + '2dd30183f9bb4c4c88d66b0aeb3ad98f');
+        if (info.type == 'text'){
+
+        }
+        next(null, n);
     }
 })
 
