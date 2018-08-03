@@ -48,7 +48,7 @@ wx_boot.set('subscribe', {
         return info.is('event') && info.param.event === 'subscribe';
     },
     handler: function (info) {
-        return '欢迎订阅悟凌斋订阅号';
+        return '欢迎订阅悟凌斋,如果你要是闷了咱俩可以聊聊天哦';
     }
 });
 
@@ -58,7 +58,7 @@ wx_boot.set('cpt', {
         if (info.type == 'text') {
             wxChat.chat(info.text, info.uid, next);
         }else {
-            next(null, '你然道不知道我只支持文字吗')
+            next(null, '你难道不知道我只支持文字吗')
         }
     }
 })
