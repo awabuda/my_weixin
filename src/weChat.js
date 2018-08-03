@@ -21,7 +21,7 @@ weMethod.prototype.auth = function (req, res) {
         timestamp = req.query.timestamp, //时间戳
         nonce = req.query.nonce, //随机数
         echostr = req.query.echostr; //随机字符串
-    console.log('0000',req.query)
+    console.log('0000', req.query)
     //2.将token、timestamp、nonce三个参数进行字典序排序
     var array = [this.token, timestamp, nonce];
     array.sort();
@@ -36,7 +36,7 @@ weMethod.prototype.auth = function (req, res) {
 
         res.send(echostr);
     } else {
-        
+
     }
 }
 //获取接口的凭证 任何微调微信的接口都需要此凭证
@@ -49,16 +49,16 @@ weMethod.prototype.getAccessToken = function () {
         //判断 本地存储的 access_token 是否有效
         var accessTokenJson = JSON.parse(fs.readFileSync(path.resolve(__dirname + '/accesstoken.json'), 'utf-8') || "{}");
         console.log(accessTokenJson);
-        if (!accessTokenJson.access_token  || accessTokenJson.expires_time < currentTime) {
+        if (!accessTokenJson.access_token || accessTokenJson.expires_time < currentTime) {
             console.log('token过期重新请求')
             request({
                     url: _this.config.apiDomain + _this.config.apiURL.all_access_token,
                     timeout: '10000',
                     method: 'GET',
                 },
-                function (req,body,data) {
+                function (req, body, data) {
                     var result = JSON.parse(data);
-                    console.log('token,重新请求成功',result);
+                    console.log('token,重新请求成功', result);
                     if (data.indexOf("errcode") < 0) {
                         accessTokenJson.access_token = result.access_token;
                         accessTokenJson.expires_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
@@ -147,20 +147,20 @@ weMethod.prototype.get_user_token = function (code) {
     return new Promise(function (resolve, reject) {
         console.log(_this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code));
         request({
-            url: _this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code),
-            timeout: '10000',
-            method: 'GET',
-        },
-        function (error, resp, res) {
-            var data = JSON.parse(res);
-            if (data.openid) {
-                resolve(data)
-            } else {
-                resolve(Object.assign({
-                    'error': 'true'
-                }, data))
-            }
-        })
+                url: _this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code),
+                timeout: '10000',
+                method: 'GET',
+            },
+            function (error, resp, res) {
+                var data = JSON.parse(res);
+                if (data.openid) {
+                    resolve(data)
+                } else {
+                    resolve(Object.assign({
+                        'error': 'true'
+                    }, data))
+                }
+            })
     })
 }
 // 获取用户信息；
@@ -171,14 +171,14 @@ weMethod.prototype.userInfo = function (req, res) {
     if (code) {
         _this.get_user_token(code).then(data => {
             console.log(typeof data)
-            console.log(data.access_token,data);
+            console.log(data.access_token, data);
             console.log(data.openid);
             if (!data.error) {
                 request({
                     url: _this.config.apiDomain + _this.config.apiURL.userinfo_api.replace('${ACCESS_TOKEN}', data.access_token).replace('${openid}', data.openid),
                     timeout: '10000',
                     method: 'GET',
-                }, function (err,resq,json) {
+                }, function (err, resq, json) {
                     var d = JSON.parse(json);
                     res.send(d);
                 })
@@ -208,17 +208,23 @@ weMethod.prototype.chat = function (text, userid, next) {
             "userId": userid
         }
     };
-    request({
-        url: "http://openapi.tuling123.com/openapi/api/v2",
-        method:"POST",
-        json: true,
-        headers: {
-            "content-type": "application/json",
-        },
-        body: data
-    }, function (rs) {
+    console.log('传入的内容', text, '传入的id', userid);
+    try {
+        request({
+            url: "http://openapi.tuling123.com/openapi/api/v2",
+            method: "POST",
+            json: true,
+            headers: {
+                "content-type": "application/json",
+            },
+            body: data
+        }, function (rs) {
             next(null, rs);
-    })
+        })
+    } catch (e) {
+        console.log(e)
+    }
+
 
 }
 //暴露可供外部访问的接口
