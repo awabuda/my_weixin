@@ -55,9 +55,7 @@ wx_boot.set('subscribe', {
 wx_boot.set('cpt', {
     pattern: /^w*/i,
     handler: function (info, next) {
-        console.log(info)
-         var n = md5('87e003775ed48a3c' + new Date().getTime() + '2dd30183f9bb4c4c88d66b0aeb3ad98f');
-         console.log(n);
+        console.log(info);
         next(null,n)
     }
 })

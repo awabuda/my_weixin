@@ -195,5 +195,32 @@ weMethod.prototype.userInfo = function (req, res) {
         })
     }
 }
+weMethod.prototype.chat = function (text, userid,res) {
+    var data = {
+        "reqType": 0,
+        "perception": {
+            "inputText": {
+                "text": text
+            }
+        },
+        "userInfo": {
+            "apiKey": "2dd30183f9bb4c4c88d66b0aeb3ad98f",
+            "userId": userid
+        }
+    };
+    request({
+        url: "http://openapi.tuling123.com/openapi/api/v2",
+        method:"POST",
+        json: true,
+        headers: {
+            "content-type": "application/json",
+        },
+        body: data
+    }, function (rs) {
+        
+        console.log(rs)
+    })
+
+}
 //暴露可供外部访问的接口
 module.exports = weMethod;
