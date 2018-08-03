@@ -1,9 +1,9 @@
 const express = require('express'),
-weMethod = require('./src/weChat'),
-request = require('request'),
-config = require('./src/config');
+    weMethod = require('./src/weChat'),
+    request = require('request'),
+    config = require('./src/config');
 var wx_boot = require('weixin-robot');
-var md5 =require('md5');
+var md5 = require('md5');
 
 var wxChat = new weMethod(config); //实例wechat 模块
 var app = express();
@@ -18,16 +18,16 @@ app.all('*', function (req, res, next) {
     } else {
         next();
     }
-});// webhook 
+}); // webhook 
 
 app.get('/wx', function (req, res) {
-    console.log('dsafdf--',req)
+    console.log('dsafdf--', req)
     wxChat.auth(req, res)
 });
 app.get('/userInfo', function (req, res) { // 入参 code
-    wxChat.userInfo(req,res);
+    wxChat.userInfo(req, res);
 });
-app.get('/signature', function (req,res) {
+app.get('/signature', function (req, res) {
     wxChat.signature(req, res)
 })
 // app.post('/wx',function (req,res){
@@ -55,8 +55,11 @@ wx_boot.set('subscribe', {
 wx_boot.set('cpt', {
     pattern: /^w*/i,
     handler: function (info, next) {
-        console.log(info);
-        next(null,n)
+        if (info.type == 'text') {
+            wxChat.chat(info.text, info.uid, next);
+        }else {
+            next(null, '你然道不知道我只支持文字吗')
+        }
     }
 })
 
@@ -67,4 +70,4 @@ wx_boot.watch(app, {
 
 app.listen(3002, function (err) {
     console.log(err);
-})  
+})

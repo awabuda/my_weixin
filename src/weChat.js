@@ -195,7 +195,7 @@ weMethod.prototype.userInfo = function (req, res) {
         })
     }
 }
-weMethod.prototype.chat = function (text, userid,res) {
+weMethod.prototype.chat = function (text, userid, next) {
     var data = {
         "reqType": 0,
         "perception": {
@@ -217,8 +217,7 @@ weMethod.prototype.chat = function (text, userid,res) {
         },
         body: data
     }, function (rs) {
-        
-        console.log(rs)
+            next(null, rs);
     })
 
 }
