@@ -55,9 +55,17 @@ wx_boot.set('subscribe', {
 wx_boot.set('test', {
     pattern: /^test/i,
     handler: function (info, next) {
-        next(null, 'roger that!')
+        next(null, '设施啥!')
+    }
+});
+wx_boot.set('*', {
+    pattern: /^w*/i,
+    handler: function (info, next) {
+        console.log(info)
+        next(null,'干啥类')
     }
 })
+
 wx_boot.watch(app, {
     token: 'wechat',
     path: '/wx'
