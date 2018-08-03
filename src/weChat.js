@@ -218,8 +218,9 @@ weMethod.prototype.chat = function (text, userid, next) {
                 "content-type": "application/json",
             },
             body: data
-        }, function (rs) {
-            next(null, rs);
+        }, function (rs,dd,json) {
+            var text = json.results && json.results[0] && json.results[0].values && json.results[0].values.text || '对你的话我无可回答'
+            next(null, text);
         })
     } catch (e) {
         console.log(e)
