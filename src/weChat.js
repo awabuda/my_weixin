@@ -208,7 +208,7 @@ weMethod.prototype.chat = function (text, userid, next) {
             "userId": userid.replace(/[^0-9a-zA-Z]*/g,'')
         }
     };
-    console.log('传入的内容', text, '传入的id', userid);
+    
     try {
         request({
             url: "http://openapi.tuling123.com/openapi/api/v2",
@@ -220,10 +220,11 @@ weMethod.prototype.chat = function (text, userid, next) {
             body: data
         }, function (rs,dd,json) {
             var text = json.results && json.results[0] && json.results[0].values && json.results[0].values.text || '对你的话我无可回答'
+            console.log('传入的内容', text, '传入的id', userid, '恢复text', text);
             next(null, text);
         })
     } catch (e) {
-        console.log(e)
+        next(null, '抱歉小悟空出错了，等住人修复后再试吧');
     }
 
 
