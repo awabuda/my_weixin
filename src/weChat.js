@@ -205,7 +205,7 @@ weMethod.prototype.chat = function (text, userid, next) {
         },
         "userInfo": {
             "apiKey": "2dd30183f9bb4c4c88d66b0aeb3ad98f",
-            "userId": userid
+            "userId": userid.replace(/[^0-9a-zA-Z]*/g,'')
         }
     };
     console.log('传入的内容', text, '传入的id', userid);
