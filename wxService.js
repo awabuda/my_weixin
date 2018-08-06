@@ -27,6 +27,9 @@ app.get('/wx', function (req, res) {
 app.get('/userInfo', function (req, res) { // 入参 code
     wxChat.userInfo(req, res);
 });
+app.get('/createMenu', function (req,res) {
+    wxChat.createMenu(req,res);
+})
 app.get('/signature', function (req, res) {
     wxChat.signature(req, res)
 })
@@ -51,7 +54,16 @@ wx_boot.set('subscribe', {
         return '欢迎订阅悟凌斋,如果你要是闷了咱俩可以聊聊天哦';
     }
 });
-
+wx_boot.set('wedding', {
+    pattern: /婚礼*/i,
+    handler: function (info, next) {
+        if (info.type == 'text') {
+            next(null, 'https://www.baidu.com')
+        } else {
+            next(null, '你难道不知道我只支持文字吗')
+        }
+    }
+})
 wx_boot.set('cpt', {
     pattern: /^w*/i,
     handler: function (info, next) {

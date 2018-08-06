@@ -229,5 +229,52 @@ weMethod.prototype.chat = function (text, userid, next) {
 
 
 }
+weMethod.prototype.createMenu =  function (req,res) {
+    this.getAccessToken().then(dd=>{
+        if (dd.access_token) {
+            request({
+                url: 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' + dd.access_token,
+                method:"POST",
+                timeout:1000,
+                headers: {
+                    "content-type": " application/json",
+                },
+                body: JSON.stringify({
+                    "button": [{
+                            "type": "click",
+                            "name": "今日歌曲",
+                            "key": "V1001_TODAY_MUSIC"
+                        },
+                        {
+                            "name": "菜单",
+                            "sub_button": [{
+                                    "type": "view",
+                                    "name": "搜索",
+                                    "url": "http://www.soso.com/"
+                                },
+                                {
+                                    "type": "miniprogram",
+                                    "name": "wxa",
+                                    "url": "http://mp.weixin.qq.com",
+                                    "appid": "wx286b93c14bbf93aa",
+                                    "pagepath": "pages/lunar/index"
+                                },
+                                {
+                                    "type": "click",
+                                    "name": "赞一下我们",
+                                    "key": "V1001_GOOD"
+                                }
+                            ]
+                        }
+                    ]
+                })
+            }, function (n,b,json) {
+                res.send(json)
+            })
+        }else{
+            res.send('access_token')
+        }
+    })
+}
 //暴露可供外部访问的接口
 module.exports = weMethod;
