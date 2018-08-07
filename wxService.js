@@ -1,9 +1,7 @@
 const express = require('express'),
     weMethod = require('./src/weChat'),
-    request = require('request'),
     config = require('./src/config');
 var wx_boot = require('weixin-robot');
-var md5 = require('md5');
 
 var wxChat = new weMethod(config); //实例wechat 模块
 var app = express();
@@ -60,7 +58,6 @@ wx_boot.set('wedding', {
         if (info.type == 'text') {
             next(null, 'https://www.baidu.com')
         } else {
-            next(null, '你难道不知道我只支持文字吗')
         }
     }
 })

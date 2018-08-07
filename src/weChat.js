@@ -2,8 +2,8 @@ var crypto = require('crypto'); //引入加密模块
 var Promise = require('promise');
 var fs = require('fs');
 var path = require('path');
-var request = require('request');
 var sha1 = require('sha1');
+var axios = require('axios');
 
 //构建 weMethod 对象 即 js中 函数就是对象
 var weMethod = function (config) {
@@ -51,26 +51,22 @@ weMethod.prototype.getAccessToken = function () {
         console.log(accessTokenJson);
         if (!accessTokenJson.access_token || accessTokenJson.expires_time < currentTime) {
             console.log('token过期重新请求')
-            request({
-                    url: _this.config.apiDomain + _this.config.apiURL.all_access_token,
-                    timeout: '10000',
-                    method: 'GET',
-                },
-                function (req, body, data) {
-                    var result = JSON.parse(data);
-                    console.log('token,重新请求成功', result);
-                    if (data.indexOf("errcode") < 0) {
-                        accessTokenJson.access_token = result.access_token;
-                        accessTokenJson.expires_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
-                        //更新本地存储的
-                        fs.writeFileSync(path.resolve(__dirname + '/accesstoken.json'), JSON.stringify(accessTokenJson));
-                        //将获取后的 access_token 返回
-                        resolve(accessTokenJson);
-                    } else {
-                        //将错误返回`
-                        resolve(result);
-                    }
-                })
+            axios.get(_this.config.apiDomain + _this.config.apiURL.all_access_token).then(data=>{
+                console.log(data);
+                 var result = JSON.parse(data);
+                if (data.indexOf("errcode") < 0) {
+                    accessTokenJson.access_token = result.access_token;
+                    accessTokenJson.expires_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
+                    //更新本地存储的
+                    fs.writeFileSync(path.resolve(__dirname + '/accesstoken.json'), JSON.stringify(accessTokenJson));
+                    //将获取后的 access_token 返回
+                    resolve(accessTokenJson);
+                } else {
+                    //将错误返回`
+                    resolve(result);
+                }
+            })
+           
         } else {
             console.log('取自缓存的token')
             //将本地存储的 access_token 返回
@@ -110,30 +106,27 @@ weMethod.prototype.signature = function (req, res) {
         _this.getAccessToken().then(data => {
             console.log('重新获取jsapi_ticket')
             if (data.access_token) {
-                request({
-                        url: _this.config.apiDomain + _this.config.apiURL.jsapi_ticket.replace('${ACCESS_TOKEN}', data.access_token),
-                        timeout: '10000',
-                        method: 'GET',
-                    },
-                    function (error, resp, json) {
-                        var result = JSON.parse(json);
-                        if (!error && resp.statusCode == 200) {
-                            accessTokenJson.jsapi_ticket = result.ticket;
-                            accessTokenJson.jsapi_ticket_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
-                            //更新本地存储的
-                            fs.writeFileSync(path.resolve(__dirname + '/accesstoken.json'), JSON.stringify(accessTokenJson));
-                            res.send({
-                                appid: _this.config.appID,
-                                noncestr: noncestr,
-                                timestamp: timestamp,
-                                url: url,
-                                jsapi_ticket: result.ticket,
-                                signature: sha1('jsapi_ticket=' + result.ticket + '&noncestr=' + noncestr + '&timestamp=' + timestamp + '&url=' + url)
-                            })
-                        } else {
-                            res.send(result);
-                        }
-                    })
+                axios.get(_this.config.apiDomain + _this.config.apiURL.jsapi_ticket.replace('${ACCESS_TOKEN}', data.access_token)).then(json=>{
+                    console.log(json);
+                    var result = JSON.parse(json);
+                    if (!error && resp.statusCode == 200) {
+                        accessTokenJson.jsapi_ticket = result.ticket;
+                        accessTokenJson.jsapi_ticket_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
+                        //更新本地存储的
+                        fs.writeFileSync(path.resolve(__dirname + '/accesstoken.json'), JSON.stringify(accessTokenJson));
+                        res.send({
+                            appid: _this.config.appID,
+                            noncestr: noncestr,
+                            timestamp: timestamp,
+                            url: url,
+                            jsapi_ticket: result.ticket,
+                            signature: sha1('jsapi_ticket=' + result.ticket + '&noncestr=' + noncestr + '&timestamp=' + timestamp + '&url=' + url)
+                        })
+                    } else {
+                        res.send(result);
+                    }
+                })
+                
             } else {
                 res.send(data);
             }
@@ -146,21 +139,18 @@ weMethod.prototype.get_user_token = function (code) {
     console.log('开始获取用户的token')
     return new Promise(function (resolve, reject) {
         console.log(_this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code));
-        request({
-                url: _this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code),
-                timeout: '10000',
-                method: 'GET',
-            },
-            function (error, resp, res) {
-                var data = JSON.parse(res);
-                if (data.openid) {
-                    resolve(data)
-                } else {
-                    resolve(Object.assign({
-                        'error': 'true'
-                    }, data))
-                }
-            })
+       axios.get(_this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code)).then(res=>{
+           console.log(res);
+        var data = JSON.parse(res);
+        if (data.openid) {
+            resolve(data)
+        } else {
+            resolve(Object.assign({
+                'error': 'true'
+            }, data))
+        }
+       })
+      
     })
 }
 // 获取用户信息；
@@ -174,14 +164,11 @@ weMethod.prototype.userInfo = function (req, res) {
             console.log(data.access_token, data);
             console.log(data.openid);
             if (!data.error) {
-                request({
-                    url: _this.config.apiDomain + _this.config.apiURL.userinfo_api.replace('${ACCESS_TOKEN}', data.access_token).replace('${openid}', data.openid),
-                    timeout: '10000',
-                    method: 'GET',
-                }, function (err, resq, json) {
+                axios.get(_this.config.apiDomain + _this.config.apiURL.userinfo_api.replace('${ACCESS_TOKEN}', data.access_token).replace('${openid}', data.openid)).then(json=>{
+                    console.log(json);
                     var d = JSON.parse(json);
                     res.send(d);
-                })
+                });
             } else {
                 console.log('1111')
                 res.send(data);
@@ -210,15 +197,12 @@ weMethod.prototype.chat = function (text, userid, next) {
     };
     
     try {
-        request({
-            url: "http://openapi.tuling123.com/openapi/api/v2",
-            method: "POST",
-            json: true,
-            headers: {
-                "content-type": "application/json",
-            },
-            body: data
-        }, function (rs,dd,json) {
+        axios.post("http://openapi.tuling123.com/openapi/api/v2", data,{
+           headers: {
+               "content-type": "application/json",
+           }
+        }).then(json=>{
+            console.log('机器人--->',json)
             var text = json.results && json.results[0] && json.results[0].values && json.results[0].values.text || '对你的话我无可回答'
             console.log('传入的内容', text, '传入的id', userid, '恢复text', text);
             next(null, text);
@@ -232,45 +216,43 @@ weMethod.prototype.chat = function (text, userid, next) {
 weMethod.prototype.createMenu =  function (req,res) {
     this.getAccessToken().then(dd=>{
         if (dd.access_token) {
-            request({
-                url: 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' + dd.access_token,
-                method:"POST",
-                timeout:1000,
+            let url ='https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' + dd.access_token;
+            var menu = {
+                "button": [{
+                        "type": "view", //view表示跳转
+                        "name": "**商城",
+                        "url": "http://***.cn/shop"
+                    },
+                    {
+                        "type": "click", //表示事件
+                        "name": "戳一下",
+                        "key": "clickEvent" //事件的key可自定义,微信服务器会发送到指定的服务器用于识别事件做出相应回应
+                    },
+                    {
+                        "name": "菜单",
+                        "sub_button": [ //二级菜单
+                            {
+                                "type": "view",
+                                "name": "搜索",
+                                "url": "http://***.cn/shop"
+                            },
+                            {
+                                "type": "click",
+                                "name": "赞一下我们",
+                                "key": "V1001_GOOD"
+                            }
+                        ]
+                    }
+                ]
+            }
+            axios.post(url, menu, {
                 headers: {
-                    "content-type": " application/json",
-                },
-                body: JSON.stringify({
-                    "button": [{
-                            "type": "click",
-                            "name": "今日歌曲",
-                            "key": "V1001_TODAY_MUSIC"
-                        },
-                        {
-                            "name": "菜单",
-                            "sub_button": [{
-                                    "type": "view",
-                                    "name": "搜索",
-                                    "url": "http://www.soso.com/"
-                                },
-                                {
-                                    "type": "miniprogram",
-                                    "name": "wxa",
-                                    "url": "http://mp.weixin.qq.com",
-                                    "appid": "wx286b93c14bbf93aa",
-                                    "pagepath": "pages/lunar/index"
-                                },
-                                {
-                                    "type": "click",
-                                    "name": "赞一下我们",
-                                    "key": "V1001_GOOD"
-                                }
-                            ]
-                        }
-                    ]
-                })
-            }, function (n,b,json) {
-                res.send(json)
+                    'content-type': 'application/x-www-form-urlencoded'
+                }
+            }).then(dt=>{
+                res.send(dt.data);
             })
+
         }else{
             res.send('access_token')
         }
