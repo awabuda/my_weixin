@@ -159,20 +159,15 @@ weMethod.prototype.userInfo = function (req, res) {
     console.log('通过code拿用户的信息')
     if (code) {
         _this.get_user_token(code).then(data => {
-            console.log(typeof data)
-            console.log(data.access_token, data);
-            console.log(data.openid);
             if (!data.error) {
                 axios.get(_this.config.apiDomain + _this.config.apiURL.userinfo_api.replace('${ACCESS_TOKEN}', data.access_token).replace('${openid}', data.openid)).then(json=>{
                     res.send(json.data);
                 });
             } else {
-                console.log('1111')
                 res.send(data);
             }
         })
     } else {
-        console.log('code wuxiao')
         res.send({
             error: true,
             errorMessage: 'code 入参错误'
