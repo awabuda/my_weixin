@@ -17,7 +17,7 @@ app.all('*', function (req, res, next) {
         next();
     }
 }); // webhook 
-app.get('/', function (res) {
+app.get('/', function (req,res) {
     res.send('欢迎')
 })
 app.get('/wx', function (req, res) {
