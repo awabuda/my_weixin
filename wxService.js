@@ -17,7 +17,9 @@ app.all('*', function (req, res, next) {
         next();
     }
 }); // webhook 
-
+app.get('/', function (res) {
+    res.send('欢迎')
+})
 app.get('/wx', function (req, res) {
     console.log('dsafdf--', req)
     wxChat.auth(req, res)
