@@ -52,9 +52,8 @@ weMethod.prototype.getAccessToken = function () {
         if (!accessTokenJson.access_token || accessTokenJson.expires_time < currentTime) {
             console.log('token过期重新请求')
             axios.get(_this.config.apiDomain + _this.config.apiURL.all_access_token).then(data=>{
-                console.log(data);
-                 var result = JSON.parse(data);
-                if (data.indexOf("errcode") < 0) {
+                 var result = data.data;
+                if (!result.errcode) {
                     accessTokenJson.access_token = result.access_token;
                     accessTokenJson.expires_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
                     //更新本地存储的
@@ -107,9 +106,9 @@ weMethod.prototype.signature = function (req, res) {
             console.log('重新获取jsapi_ticket')
             if (data.access_token) {
                 axios.get(_this.config.apiDomain + _this.config.apiURL.jsapi_ticket.replace('${ACCESS_TOKEN}', data.access_token)).then(json=>{
-                    console.log(json);
-                    var result = JSON.parse(json);
-                    if (!error && resp.statusCode == 200) {
+                    console.log(json.data);
+                    var result = json.data;
+                    if (!result.errcode) {
                         accessTokenJson.jsapi_ticket = result.ticket;
                         accessTokenJson.jsapi_ticket_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
                         //更新本地存储的
@@ -141,7 +140,7 @@ weMethod.prototype.get_user_token = function (code) {
         console.log(_this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code));
        axios.get(_this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code)).then(res=>{
            console.log(res);
-        var data = JSON.parse(res);
+        var data = res.data;
         if (data.openid) {
             resolve(data)
         } else {
@@ -165,9 +164,7 @@ weMethod.prototype.userInfo = function (req, res) {
             console.log(data.openid);
             if (!data.error) {
                 axios.get(_this.config.apiDomain + _this.config.apiURL.userinfo_api.replace('${ACCESS_TOKEN}', data.access_token).replace('${openid}', data.openid)).then(json=>{
-                    console.log(json);
-                    var d = JSON.parse(json);
-                    res.send(d);
+                    res.send(json.data);
                 });
             } else {
                 console.log('1111')
@@ -202,7 +199,7 @@ weMethod.prototype.chat = function (text, userid, next) {
                "content-type": "application/json",
            }
         }).then(json=>{
-            console.log('机器人--->',json)
+            var json = json.data;
             var text = json.results && json.results[0] && json.results[0].values && json.results[0].values.text || '对你的话我无可回答'
             console.log('传入的内容', text, '传入的id', userid, '恢复text', text);
             next(null, text);
