@@ -21,7 +21,6 @@ weMethod.prototype.auth = function (req, res) {
         timestamp = req.query.timestamp, //时间戳
         nonce = req.query.nonce, //随机数
         echostr = req.query.echostr; //随机字符串
-    console.log('0000', req.query)
     //2.将token、timestamp、nonce三个参数进行字典序排序
     var array = [this.token, timestamp, nonce];
     array.sort();
@@ -42,17 +41,14 @@ weMethod.prototype.auth = function (req, res) {
 //获取接口的凭证 任何微调微信的接口都需要此凭证
 weMethod.prototype.getAccessToken = function () {
     var _this = this;
-    console.log('开始获取token')
     return new Promise(function (resolve, rej) {
         //获取当前时间 
         var currentTime = new Date().getTime();
         //判断 本地存储的 access_token 是否有效
         var accessTokenJson = JSON.parse(fs.readFileSync(path.resolve(__dirname + '/accesstoken.json'), 'utf-8') || "{}");
-        console.log(accessTokenJson);
         if (!accessTokenJson.access_token || accessTokenJson.expires_time < currentTime) {
-            console.log('token过期重新请求')
-            axios.get(_this.config.apiDomain + _this.config.apiURL.all_access_token).then(data=>{
-                 var result = data.data;
+            axios.get(_this.config.apiDomain + _this.config.apiURL.all_access_token).then(data => {
+                var result = data.data;
                 if (!result.errcode) {
                     accessTokenJson.access_token = result.access_token;
                     accessTokenJson.expires_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
@@ -65,9 +61,8 @@ weMethod.prototype.getAccessToken = function () {
                     resolve(result);
                 }
             })
-           
+
         } else {
-            console.log('取自缓存的token')
             //将本地存储的 access_token 返回
             resolve(accessTokenJson);
         }
@@ -105,8 +100,7 @@ weMethod.prototype.signature = function (req, res) {
         _this.getAccessToken().then(data => {
             console.log('重新获取jsapi_ticket')
             if (data.access_token) {
-                axios.get(_this.config.apiDomain + _this.config.apiURL.jsapi_ticket.replace('${ACCESS_TOKEN}', data.access_token)).then(json=>{
-                    console.log(json.data);
+                axios.get(_this.config.apiDomain + _this.config.apiURL.jsapi_ticket.replace('${ACCESS_TOKEN}', data.access_token)).then(json => {
                     var result = json.data;
                     if (!result.errcode) {
                         accessTokenJson.jsapi_ticket = result.ticket;
@@ -125,7 +119,7 @@ weMethod.prototype.signature = function (req, res) {
                         res.send(result);
                     }
                 })
-                
+
             } else {
                 res.send(data);
             }
@@ -137,19 +131,17 @@ weMethod.prototype.get_user_token = function (code) {
     var _this = this;
     console.log('开始获取用户的token')
     return new Promise(function (resolve, reject) {
-        console.log(_this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code));
-       axios.get(_this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code)).then(res=>{
-           console.log(res);
-        var data = res.data;
-        if (data.openid) {
-            resolve(data)
-        } else {
-            resolve(Object.assign({
-                'error': 'true'
-            }, data))
-        }
-       })
-      
+        axios.get(_this.config.apiDomain + _this.config.apiURL.user_access_token_api.replace('${code}', code)).then(res => {
+            var data = res.data;
+            if (data.openid) {
+                resolve(data)
+            } else {
+                resolve(Object.assign({
+                    'error': 'true'
+                }, data))
+            }
+        })
+
     })
 }
 // 获取用户信息；
@@ -160,7 +152,7 @@ weMethod.prototype.userInfo = function (req, res) {
     if (code) {
         _this.get_user_token(code).then(data => {
             if (!data.error) {
-                axios.get(_this.config.apiDomain + _this.config.apiURL.userinfo_api.replace('${ACCESS_TOKEN}', data.access_token).replace('${openid}', data.openid)).then(json=>{
+                axios.get(_this.config.apiDomain + _this.config.apiURL.userinfo_api.replace('${ACCESS_TOKEN}', data.access_token).replace('${openid}', data.openid)).then(json => {
                     res.send(json.data);
                 });
             } else {
@@ -184,16 +176,16 @@ weMethod.prototype.chat = function (text, userid, next) {
         },
         "userInfo": {
             "apiKey": "2dd30183f9bb4c4c88d66b0aeb3ad98f",
-            "userId": userid.replace(/[^0-9a-zA-Z]*/g,'')
+            "userId": userid.replace(/[^0-9a-zA-Z]*/g, '')
         }
     };
-    
+
     try {
-        axios.post("http://openapi.tuling123.com/openapi/api/v2", data,{
-           headers: {
-               "content-type": "application/json",
-           }
-        }).then(json=>{
+        axios.post(this.config.tulingapi, data, {
+            headers: {
+                "content-type": "application/json",
+            }
+        }).then(json => {
             var json = json.data;
             var text = json.results && json.results[0] && json.results[0].values && json.results[0].values.text || '对你的话我无可回答'
             console.log('传入的内容', text, '传入的id', userid, '恢复text', text);
@@ -205,50 +197,144 @@ weMethod.prototype.chat = function (text, userid, next) {
 
 
 }
-weMethod.prototype.createMenu =  function (req,res) {
-    this.getAccessToken().then(dd=>{
+weMethod.prototype.createMenu = function (req, res) {
+    let _this = this;
+    this.getAccessToken().then(dd => {
         if (dd.access_token) {
-            let url ='https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' + dd.access_token;
-            var menu = {
-                "button": [{
-                        "type": "view", //view表示跳转
-                        "name": "**商城",
-                        "url": "http://***.cn/shop"
-                    },
-                    {
-                        "type": "click", //表示事件
-                        "name": "戳一下",
-                        "key": "clickEvent" //事件的key可自定义,微信服务器会发送到指定的服务器用于识别事件做出相应回应
-                    },
-                    {
-                        "name": "菜单",
-                        "sub_button": [ //二级菜单
-                            {
-                                "type": "view",
-                                "name": "搜索",
-                                "url": "http://***.cn/shop"
-                            },
-                            {
-                                "type": "click",
-                                "name": "赞一下我们",
-                                "key": "V1001_GOOD"
-                            }
-                        ]
-                    }
-                ]
-            }
-            axios.post(url, menu, {
+            axios.post(_this.config.apiDomain + _this.config.apiURL.createMenu.replace('${ACCESS_TOKEN}', dd.access_token), _this.config.menu, {
                 headers: {
                     'content-type': 'application/x-www-form-urlencoded'
                 }
-            }).then(dt=>{
+            }).then(dt => {
                 res.send(dt.data);
             })
 
-        }else{
-            res.send('access_token')
+        } else {
+            res.send('无access_token')
         }
     })
 }
+weMethod.prototype.getMenu = function (req, res) {
+    let _this = this;
+    this.getAccessToken().then(dd => {
+        if (dd.access_token) {
+            axios.get(_this.config.apiDomain + _this.config.apiURL.getMenu.replace('${ACCESS_TOKEN}', dd.access_token)).then(data => {
+                res.send(data.data)
+            }).catch(e => {
+                res.send(e)
+            })
+        } else {
+            res.send('无access_token')
+        }
+    })
+}
+weMethod.prototype.delectMenu = function (req, res) {
+    let _this = this;
+    this.getAccessToken().then(dd => {
+        if (dd.access_token) {
+            axios.get(_this.config.apiDomain + _this.config.apiURL.delectMenu.replace('${ACCESS_TOKEN}', dd.access_token)).then(data => {
+                res.send(data.data)
+            }).catch(e => {
+                res.send(e)
+            })
+        } else {
+            res.send('无access_token')
+        }
+    })
+}
+// 公众号设置标签
+weMethod.prototype.createtag = function (req, res) {
+    let _this = this;
+    let __name = req.query.name;
+    if (__name) {
+        let param = {
+            tag: {
+                name: __name
+            }
+        }
+        this.getAccessToken().then(dd => {
+            if (dd.access_token) {
+                axios.post(_this.config.apiDomain + _this.config.apiURL.createTag.replace('${ACCESS_TOKEN}', dd.access_token), param,{
+                    headers:{
+                        "content-type": "application/json",
+                    }
+                }).then(data => {
+                    res.send(data.data)
+                }).catch(e => {
+                    res.send(e)
+                })
+            } else {
+                res.send('无access_token')
+            }
+        })
+    } else {
+        res.send('参数不合法')
+    }
+}
+// 给关注者设置备注
+weMethod.prototype.updateremark = function (req,res) {
+    let _this = this;
+    let openid = req.query.openid;
+    let remark = req.query.remark;
+    if (openid && remark) {
+        let param = {
+            openid: openid,
+            remark: remark
+        }
+        this.getAccessToken().then(dd => {
+            if (dd.access_token) {
+                axios.post(_this.config.apiDomain + _this.config.apiURL.updateremark.replace('${ACCESS_TOKEN}', dd.access_token), param, {
+                    headers: {
+                        "content-type": "application/json",
+                    }
+                }).then(data => {
+                    res.send(data.data)
+                }).catch(e => {
+                    res.send(e)
+                })
+            } else {
+                res.send('无access_token')
+            }
+        })
+    }else{
+        res.send('参数不合法')
+    }
+}
+// 根据用户的openid获取用户的信息，比如在后台系统的应用
+weMethod.prototype.openidUserInfo =  function (req,res) {
+    let _this = this;
+    let openid = req.query.openid;
+    if (openid){
+        this.getAccessToken().then(dd => {
+            if (dd.access_token) {
+                axios.get(_this.config.apiDomain + _this.config.apiURL.openid_useinfo.replace('${ACCESS_TOKEN}', dd.access_token).replace('${openid}', openid)).then(data => {
+                    res.send(data.data)
+                }).catch(e => {
+                    res.send(e)
+                })
+            } else {
+                res.send('无access_token')
+            }
+        })
+    }else {
+        res.send('openid参数不合法')
+    }
+}
+weMethod.prototype.uselist = function (req, res) {
+    let _this = this;
+    let NEXT_OPENID = req.query.openid;
+    this.getAccessToken().then(dd => {
+        if (dd.access_token) {
+            axios.get(_this.config.apiDomain + _this.config.apiURL.uselist.replace('${ACCESS_TOKEN}', dd.access_token).replace('${NEXT_OPENID}', NEXT_OPENID || '')).then(data => {
+                res.send(data.data)
+            }).catch(e => {
+                res.send(e)
+            })
+        } else {
+            res.send('无access_token')
+        }
+    })
+}
+
 //暴露可供外部访问的接口
 module.exports = weMethod;

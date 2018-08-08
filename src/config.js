@@ -33,7 +33,51 @@ module.exports = {
         // 获取用户的信息 该ACCESS_TOKEN为网页授权接口调用凭证 openid 用户的唯一标识
         'userinfo_api': 'sns/userinfo?access_token=${ACCESS_TOKEN}&openid=${openid}&lang=zh_CN',
         // 微信接口票据
-        'jsapi_ticket': 'cgi-bin/ticket/getticket?access_token=${ACCESS_TOKEN}&type=jsapi'
+        'jsapi_ticket': 'cgi-bin/ticket/getticket?access_token=${ACCESS_TOKEN}&type=jsapi',
+        // 创建菜单
+        'createMenu': 'cgi-bin/menu/create?access_token=${ACCESS_TOKEN}',
+        // 获取菜单
+        'getMenu': 'cgi-bin/menu/get?access_token=${ACCESS_TOKEN}',
+        // 删除菜单
+        'delectMenu': 'cgi-bin/menu/delete?access_token=${ACCESS_TOKEN}',
+        // 给公众号设置标签
+        'createTag': 'cgi-bin/tags/create?access_token=${ACCESS_TOKEN}',
+        // 设置用户的备注名
+        'updateremark': 'cgi-bin/user/info/updateremark?access_token=${ACCESS_TOKEN}',
+        // 根据openid获取用户信息
+        'openid_useinfo': 'cgi-bin/user/info?access_token=${ACCESS_TOKEN}&openid=${openid}&lang=zh_CN',
+        // 获取用户列表  默认取1000条，
+        'uselist': 'cgi-bin/user/get?access_token=${ACCESS_TOKEN}&next_openid=${NEXT_OPENID}'
+        
+    },
+    tulingapi: "http://openapi.tuling123.com/openapi/api/v2",
+    menu: {
+        "button": [{
+                "type": "view", //view表示跳转
+                "name": "**商城",
+                "url": "http://***.cn/shop"
+            },
+            {
+                "type": "click", //表示事件
+                "name": "戳一下",
+                "key": "clickEvent" //事件的key可自定义,微信服务器会发送到指定的服务器用于识别事件做出相应回应
+            },
+            {
+                "name": "菜单",
+                "sub_button": [ //二级菜单
+                    {
+                        "type": "view",
+                        "name": "搜索",
+                        "url": "http://***.cn/shop"
+                    },
+                    {
+                        "type": "click",
+                        "name": "赞一下我们",
+                        "key": "V1001_GOOD"
+                    }
+                ]
+            }
+        ]
     }
 
 }
