@@ -1,10 +1,13 @@
-const express = require('express'),
-    weMethod = require('./src/weChat'),
-    config = require('./src/config');
-var wx_boot = require('weixin-robot');
+let express = require('express');
+let app = express();
+let http = require('http').Server(app);
+let io = require('socket.io')(http);
+let weMethod = require('./src/weChat'); // 微信方法 
+let config = require('./src/config'); // 默认配置
+let wx_boot = require('weixin-robot'); // 微信机器人
+let wxChat = new weMethod(config); //实例wechat 模块
+let onlineCount = 0;
 
-var wxChat = new weMethod(config); //实例wechat 模块
-var app = express();
 // 允许跨域
 app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -17,10 +20,11 @@ app.all('*', function (req, res, next) {
         next();
     }
 }); // webhook 
-app.get('/', function (req,res) {
-    console.log('code-----',req.query.code);
-    res.send('欢迎')
-})
+app.use(express.static(__dirname));
+app.get('/', function (req, res) {
+    console.log('code-----', req.query.code);
+    res.sendFile(__dirname + '/index.html');
+});
 // 微信认证
 app.get('/wx', function (req, res) {
     wxChat.auth(req, res)
@@ -87,7 +91,32 @@ wx_boot.watch(app, {
     token: 'wechat',
     path: '/wx'
 });
+
 // 起服务
-app.listen(3002, function (err) {
+// 当有用户连接进来时
+io.on('connection', function (socket) {
+    console.log(socket);
+    console.log('a user connected');
+
+    // 发送给客户端在线人数
+    io.emit('connected', ++onlineCount);
+
+    // 当有用户断开
+    socket.on('disconnect', function () {
+        console.log('user disconnected');
+
+        // 发送给客户端断在线人数
+        io.emit('disconnected', --onlineCount);
+        console.log(onlineCount);
+    });
+
+    // 收到了客户端发来的消息
+    socket.on('message', function (message) {
+        // 给客户端发送消息
+        io.emit('message', message);
+    });
+
+});
+http.listen(3002, function (err) {
     console.log(err);
 })
