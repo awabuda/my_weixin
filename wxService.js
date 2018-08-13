@@ -25,6 +25,9 @@ app.get('/', function (req, res) {
     console.log('code-----', req.query.code);
     res.sendFile(__dirname + '/index.html');
 });
+app.get('/loginredirect', function (req,res) {
+    res.redirect(config.redirect_url);
+})
 // 微信认证
 app.get('/wx', function (req, res) {
     wxChat.auth(req, res)

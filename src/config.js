@@ -1,5 +1,6 @@
 
 module.exports = {
+    'redirect_url': 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa9d7e371ea59e8a0&redirect_uri=http%3A%2F%2Fwx.5zreo.cn&response_type=code&scope=snsapi_base&state=present',
     'token': 'wechat',
     'appID': 'wxa9d7e371ea59e8a0',
     'appScrect': '1bba3ed5665aa91a844a6be171c9adc5',
