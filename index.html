@@ -14,15 +14,15 @@
     <script>
         // socket部分 
         var socket = io(); // 当接收到消息并且不是本机时生成聊天气泡 
-        // socket.on('message', function (information) {
-        //     // console.log(information);
-        // }); // 当接收到有人连接进来 
-        // socket.on('connected', function (onlinecount) {
-        //     // console.log(onlinecount);
-        // }); // 当接收到有人断开后 
-        // socket.on('disconnected', function (onlinecount) {
-        //     // console.log(onlinecount);
-        // });
+        socket.on('message', function (information) {
+            console.log(information);
+        }); // 当接收到有人连接进来 
+        socket.on('connected', function (onlinecount) {
+            console.log(onlinecount);
+        }); // 当接收到有人断开后 
+        socket.on('disconnected', function (onlinecount) {
+            console.log(onlinecount);
+        });
     </script>
 </body>
 
