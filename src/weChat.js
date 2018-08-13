@@ -198,7 +198,7 @@ weMethod.prototype.chat = function (text, userid, next) {
 
 }
 weMethod.prototype.createMenu = function (req, res) {
-    let _this = this;
+    var _this = this;
     this.getAccessToken().then(dd => {
         if (dd.access_token) {
             axios.post(_this.config.apiDomain + _this.config.apiURL.createMenu.replace('${ACCESS_TOKEN}', dd.access_token), _this.config.menu, {
@@ -215,7 +215,7 @@ weMethod.prototype.createMenu = function (req, res) {
     })
 }
 weMethod.prototype.getMenu = function (req, res) {
-    let _this = this;
+    var _this = this;
     this.getAccessToken().then(dd => {
         if (dd.access_token) {
             axios.get(_this.config.apiDomain + _this.config.apiURL.getMenu.replace('${ACCESS_TOKEN}', dd.access_token)).then(data => {
@@ -229,7 +229,7 @@ weMethod.prototype.getMenu = function (req, res) {
     })
 }
 weMethod.prototype.delectMenu = function (req, res) {
-    let _this = this;
+    var _this = this;
     this.getAccessToken().then(dd => {
         if (dd.access_token) {
             axios.get(_this.config.apiDomain + _this.config.apiURL.delectMenu.replace('${ACCESS_TOKEN}', dd.access_token)).then(data => {
@@ -244,10 +244,10 @@ weMethod.prototype.delectMenu = function (req, res) {
 }
 // 公众号设置标签
 weMethod.prototype.createtag = function (req, res) {
-    let _this = this;
-    let __name = req.query.name;
+    var _this = this;
+    var __name = req.query.name;
     if (__name) {
-        let param = {
+        var param = {
             tag: {
                 name: __name
             }
@@ -273,11 +273,11 @@ weMethod.prototype.createtag = function (req, res) {
 }
 // 给关注者设置备注
 weMethod.prototype.updateremark = function (req,res) {
-    let _this = this;
-    let openid = req.query.openid;
-    let remark = req.query.remark;
+    var _this = this;
+    var openid = req.query.openid;
+    var remark = req.query.remark;
     if (openid && remark) {
-        let param = {
+        var param = {
             openid: openid,
             remark: remark
         }
@@ -302,8 +302,8 @@ weMethod.prototype.updateremark = function (req,res) {
 }
 // 根据用户的openid获取用户的信息，比如在后台系统的应用
 weMethod.prototype.openidUserInfo =  function (req,res) {
-    let _this = this;
-    let openid = req.query.openid;
+    var _this = this;
+    var openid = req.query.openid;
     if (openid){
         this.getAccessToken().then(dd => {
             if (dd.access_token) {
@@ -321,8 +321,8 @@ weMethod.prototype.openidUserInfo =  function (req,res) {
     }
 }
 weMethod.prototype.uselist = function (req, res) {
-    let _this = this;
-    let NEXT_OPENID = req.query.openid;
+    var _this = this;
+    var NEXT_OPENID = req.query.openid;
     this.getAccessToken().then(dd => {
         if (dd.access_token) {
             axios.get(_this.config.apiDomain + _this.config.apiURL.uselist.replace('${ACCESS_TOKEN}', dd.access_token).replace('${NEXT_OPENID}', NEXT_OPENID || '')).then(data => {

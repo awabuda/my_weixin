@@ -1,18 +1,18 @@
-let express = require('express');
-let app = express();
-let http = require('http').Server(app);
-let io = require('socket.io')(http);
-let weMethod = require('./src/weChat'); // 微信方法 
-let config = require('./src/config'); // 默认配置
-let wx_boot = require('weixin-robot'); // 微信机器人
-let wxChat = new weMethod(config); //实例wechat 模块
-let onlineCount = 0;
+var express = require('express');
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var weMethod = require('./src/weChat'); // 微信方法 
+var config = require('./src/config'); // 默认配置
+var wx_boot = require('weixin-robot'); // 微信机器人
+var wxChat = new weMethod(config); //实例wechat 模块
+var onlineCount = 0;
 
 // 允许跨域
 app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
-    res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DEvarE, OPTIONS');
 
     if (req.method == 'OPTIONS') {
         res.send(200);
