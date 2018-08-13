@@ -98,23 +98,23 @@ io.on('connection', function (socket) {
     console.log(socket);
     console.log('a user connected');
 
-    // 发送给客户端在线人数
-    io.emit('connected', ++onlineCount);
+    // // 发送给客户端在线人数
+    // io.emit('connected', ++onlineCount);
 
-    // 当有用户断开
-    socket.on('disconnect', function () {
-        console.log('user disconnected');
+    // // 当有用户断开
+    // socket.on('disconnect', function () {
+    //     console.log('user disconnected');
 
-        // 发送给客户端断在线人数
-        io.emit('disconnected', --onlineCount);
-        console.log(onlineCount);
-    });
+    //     // 发送给客户端断在线人数
+    //     io.emit('disconnected', --onlineCount);
+    //     console.log(onlineCount);
+    // });
 
-    // 收到了客户端发来的消息
-    socket.on('message', function (message) {
-        // 给客户端发送消息
-        io.emit('message', message);
-    });
+    // // 收到了客户端发来的消息
+    // socket.on('message', function (message) {
+    //     // 给客户端发送消息
+    //     io.emit('message', message);
+    // });
 
 });
 http.listen(3002, function (err) {
