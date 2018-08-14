@@ -9,6 +9,7 @@
     "crypto": "^1.0.1",
     "express": "^4.16.3",
     "github-webhook-handler": "^0.7.1",
+    "koa": "^2.5.2",
     "md5": "^2.2.1",
     "promise": "^8.0.1",
     "request": "^2.87.0",
