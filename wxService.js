@@ -8,7 +8,7 @@ var config = require('./src/config'); // 默认配置
 var wx_boot = require('weixin-robot'); // 微信机器人
 var wxChat = new weMethod(config); //实例wechat 模块
 var onlineCount = 0;
-
+// test
 // 允许跨域
 app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -102,7 +102,7 @@ wx_boot.watch(app, {
 
 // 当有用户连接进来时
 io.on('connection', function (socket) {
-    console.log(socket);
+    console.log(socket)
     console.log('a user connected');
 
     // 发送给客户端在线人数
