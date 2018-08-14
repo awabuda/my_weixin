@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var crypto = require('crypto');
 var exec = require('child_process').exec;
 var app = express();
 var http = require('http').Server(app);
@@ -86,8 +87,11 @@ app.get('/uselist', function (req,res) {
     wxChat.uselist(req,res)
 })
 app.post('/gitpush', function (req,res) {
-    console.log('body--->',req.body)
-    var data='';
+ 
+ const hmac = crypto.createHmac('sha1', 'weixin');
+ const blob = JSON.stringify(req.body.payload);
+const ourSignature = `sha1=${crypto.createHmac('sha1', secret).update(blob).digest('hex')}`;
+console.log(ourSignature);
     // req.on('data', function (chuck) {
     //     data += chuck;
     // })
