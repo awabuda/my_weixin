@@ -88,14 +88,13 @@ app.get('/uselist', function (req,res) {
 })
 app.post('/gitpush', function (req,res) {
     var data = '';
-    console.log(req.body.payload);
     req.on('data', function (chuck) {
         data += chuck;
     })
     req.on('end', function () {
          const hmac = crypto.createHmac('sha1', 'weixin');
          const ourSignature = `sha1=${hmac.update(data).digest('hex')}`;
-         console.log(ourSignature);
+         console.log(ourSignature, req.headers['x-hub-signature']);
         if (!!req.headers['x-hub-signature'] && req.headers['x-hub-signature'] == ourSignature) {
            res.send('校验通过');
 
