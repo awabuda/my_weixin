@@ -70,12 +70,7 @@ app.get('/uselist', function (req,res) {
     wxChat.uselist(req,res)
 })
 app.post('/gitpush', function (req,res) {
-    var data = ''
-    req.on('data', function (chunck) {
-        data += chunck;
-    }).on('end', function(){
-        console.log(data)
-    })
+
     res.send('ok')
 })
 
