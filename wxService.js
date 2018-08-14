@@ -88,14 +88,14 @@ app.get('/uselist', function (req,res) {
 app.post('/gitpush', function (req,res) {
     console.log('body--->',req.body)
     var data='';
-    req.on('data', function (chuck) {
-        data += chuck;
-    })
-    req.on('end', function () {
-        console.log('dafafd-----',data)
-    });
-    console.log(req);
-    res.send('ok')
+    // req.on('data', function (chuck) {
+    //     data += chuck;
+    // })
+    // req.on('end', function () {
+    //     console.log('dafafd-----',data)
+    // });
+    // console.log(req);
+    res.send(req);
 })
 
 // 关注后的规则
