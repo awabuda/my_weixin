@@ -88,18 +88,18 @@ app.get('/uselist', function (req,res) {
 })
 app.post('/gitpush', function (req,res) {
  
- const hmac = crypto.createHmac('sha1', 'weixin');
- const blob = JSON.stringify(req.body.payload);
-const ourSignature = `sha1=${crypto.createHmac('sha1', secret).update(blob).digest('hex')}`;
-console.log(ourSignature);
-    // req.on('data', function (chuck) {
-    //     data += chuck;
-    // })
-    // req.on('end', function () {
-    //     console.log('dafafd-----',data)
-    // });
-    // console.log(req);
-    res.send(req);
+
+    req.on('data', function (chuck) {
+        data += chuck;
+    })
+    req.on('end', function () {
+         const hmac = crypto.createHmac('sha1', 'weixin');
+         const ourSignature = `sha1=${hmac.update(data).digest('hex')}`;
+         console.log(ourSignature);
+         console.log(data);
+         res.send(req);
+    });
+    
 })
 
 // 关注后的规则
