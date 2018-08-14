@@ -4,6 +4,7 @@
   "description": "微信认证",
   "main": "wxService.js",
   "dependencies": {
+    "ajv": "^6.5.2",
     "body-parser": "^1.18.3",
     "crypto": "^1.0.1",
     "express": "^4.16.3",
