@@ -1,4 +1,5 @@
 var express = require('express');
+var shell = require('shell');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -67,6 +68,22 @@ app.get('/openiduseinfo', function(req,res){
 // 用户列表
 app.get('/uselist', function (req,res) {
     wxChat.uselist(req,res)
+})
+app.post('/gitpush', function (req,res) {
+    var Gitpull;
+    shell.cd('./');
+    var data = '';
+    req.on('data', function(chunck){
+        data += chunck
+    }).on('end', function (){
+        console.log(data);
+    })
+    Gitpull = shell.exec('git pull origin master');
+    if (Gitpull.code != 0){
+        res.send('更新失败')
+    }else{
+        res.send('ok')
+    }
 })
 
 // 关注后的规则
