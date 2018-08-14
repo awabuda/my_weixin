@@ -90,8 +90,10 @@ app.post('/gitpush', function (req,res) {
          const ourSignature = `sha1=${hmac.update(data).digest('hex')}`;
          console.log(ourSignature, req.headers['x-hub-signature']);
         if (!!req.headers['x-hub-signature'] && req.headers['x-hub-signature'] == ourSignature) {
-            cmdStr = 'git pull origin master && npm i';
+           var cmdStr = 'git pull origin master && npm i';
+            console.log('正在拉取代码');
             exec(cmdStr, function (error, stdout, stderr) {
+                console.log(stderr);
                 if (error){
                     console.log(error)
                 }
