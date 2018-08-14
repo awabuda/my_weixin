@@ -95,10 +95,9 @@ app.post('/gitpush', function (req,res) {
            var cmdStr = 'git pull origin master && npm i';
             console.log('正在拉取代码');
             exec(cmdStr, function (error, stdout, stderr) {
+                console.log(stdout);
                 console.log(stderr);
-                if (error){
-                    console.log(error)
-                }
+
             })
            res.send('校验通过');
 
