@@ -87,8 +87,7 @@ app.get('/uselist', function (req,res) {
     wxChat.uselist(req,res)
 })
 app.post('/gitpush', function (req,res) {
- 
-
+    var data = '';
     req.on('data', function (chuck) {
         data += chuck;
     })
@@ -96,8 +95,13 @@ app.post('/gitpush', function (req,res) {
          const hmac = crypto.createHmac('sha1', 'weixin');
          const ourSignature = `sha1=${hmac.update(data).digest('hex')}`;
          console.log(ourSignature);
-         console.log(data);
-         res.send(req);
+        if (!!req.headers['x-hub-signature'] && req.headers['x-hub-signature'] == ourSignature) {
+           res.send('校验通过');
+
+        }else{
+            console.log('非法请求')
+        }
+            
     });
     
 })
