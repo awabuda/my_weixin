@@ -1,5 +1,5 @@
 var express = require('express');
-var shell = require('shell');
+var exec = require('child_process').exec;
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -20,7 +20,7 @@ app.all('*', function (req, res, next) {
     } else {
         next();
     }
-}); // webhook 
+}); 
 app.use(express.static(__dirname));
 app.get('/', function (req, res) {
     console.log('code-----', req.query.code);
@@ -70,20 +70,13 @@ app.get('/uselist', function (req,res) {
     wxChat.uselist(req,res)
 })
 app.post('/gitpush', function (req,res) {
-    var Gitpull;
-    shell.cd('./');
-    var data = '';
-    req.on('data', function(chunck){
-        data += chunck
-    }).on('end', function (){
-        console.log(data);
+    var data = ''
+    req.on('data', function (chunck) {
+        data += chunck;
+    }).on('end', function(){
+        console.log(data)
     })
-    Gitpull = shell.exec('git pull origin master');
-    if (Gitpull.code != 0){
-        res.send('更新失败')
-    }else{
-        res.send('ok')
-    }
+    res.send('ok')
 })
 
 // 关注后的规则
@@ -112,7 +105,6 @@ wx_boot.watch(app, {
     path: '/wx'
 });
 
-// 起服务
 // 当有用户连接进来时
 io.on('connection', function (socket) {
     console.log(socket);
@@ -137,6 +129,8 @@ io.on('connection', function (socket) {
     });
 
 });
+// 起服务
+
 http.listen(3002, function (err) {
     console.log(err);
 })
