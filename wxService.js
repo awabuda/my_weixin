@@ -1,4 +1,5 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var exec = require('child_process').exec;
 var app = express();
 var http = require('http').Server(app);
@@ -21,6 +22,21 @@ app.all('*', function (req, res, next) {
         next();
     }
 }); 
+// 解析自定义的 JSON
+app.use(bodyParser.json({
+    type: 'application/*+json'
+}))
+
+// 解析自定义的 Buffer
+app.use(bodyParser.raw({
+    type: 'application/vnd.custom-type'
+}))
+
+// 将 HTML 请求体做为字符串处理
+app.use(bodyParser.text({
+    type: 'text/html'
+}))
+app.use(bodyParser.urlencoded())
 app.use(express.static(__dirname));
 app.get('/', function (req, res) {
     console.log('code-----', req.query.code);
@@ -70,7 +86,15 @@ app.get('/uselist', function (req,res) {
     wxChat.uselist(req,res)
 })
 app.post('/gitpush', function (req,res) {
-
+    console.log('body--->',req.body)
+    var data='';
+    req.on('data', function (chuck) {
+        data += chuck;
+    })
+    req.on('end', function () {
+        console.log('dafafd-----',data)
+    });
+    console.log(req);
     res.send('ok')
 })
 

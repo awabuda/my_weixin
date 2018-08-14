@@ -4,6 +4,7 @@
   "description": "微信认证",
   "main": "wxService.js",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "crypto": "^1.0.1",
     "express": "^4.16.3",
     "github-webhook-handler": "^0.7.1",
