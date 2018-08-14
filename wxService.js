@@ -35,7 +35,9 @@ app.use(bodyParser.raw({
 app.use(bodyParser.text({
     type: 'text/html'
 }))
-app.use(bodyParser.urlencoded())
+app.use(bodyParser.urlencoded({
+    extended: true
+}))
 
 app.get('/loginredirect', function (req,res) {
     res.redirect(config.redirect_url);
