@@ -27,22 +27,16 @@ app.all('*', function (req, res, next) {
 app.use(bodyParser.json({
     type: 'application/*+json'
 }))
-
 // 解析自定义的 Buffer
 app.use(bodyParser.raw({
     type: 'application/vnd.custom-type'
 }))
-
 // 将 HTML 请求体做为字符串处理
 app.use(bodyParser.text({
     type: 'text/html'
 }))
 app.use(bodyParser.urlencoded())
-app.use(express.static(__dirname));
-app.get('/', function (req, res) {
-    console.log('code-----', req.query.code);
-    res.sendFile(__dirname + '/index.html');
-});
+
 app.get('/loginredirect', function (req,res) {
     res.redirect(config.redirect_url);
 })
@@ -96,6 +90,12 @@ app.post('/gitpush', function (req,res) {
          const ourSignature = `sha1=${hmac.update(data).digest('hex')}`;
          console.log(ourSignature, req.headers['x-hub-signature']);
         if (!!req.headers['x-hub-signature'] && req.headers['x-hub-signature'] == ourSignature) {
+            cmdStr = 'git pull origin master && npm i';
+            exec(cmdStr, function (error, stdout, stderr) {
+                if (error){
+                    console.log(error)
+                }
+            })
            res.send('校验通过');
 
         }else{
