@@ -88,6 +88,7 @@ app.get('/uselist', function (req,res) {
 })
 app.post('/gitpush', function (req,res) {
     var data = '';
+    console.log(req.body.payload);
     req.on('data', function (chuck) {
         data += chuck;
     })
