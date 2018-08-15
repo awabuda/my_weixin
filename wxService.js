@@ -1,13 +1,14 @@
 var express = require('express');
-var bodyParser = require('body-parser');
-var crypto = require('crypto');
-var exec = require('child_process').exec;
+var cookieParser = require('cookie-parser');// cookie中间件
+var bodyParser = require('body-parser'); // body中间件
+var wx_boot = require('weixin-robot'); // 微信机器人
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var webhook = require('./src/config');
 var weMethod = require('./src/weChat'); // 微信方法 
 var config = require('./src/config'); // 默认配置
-var wx_boot = require('weixin-robot'); // 微信机器人
+var video_api = require('./src/api_video');
 var wxChat = new weMethod(config); //实例wechat 模块
 var onlineCount = 0;
 // test
@@ -23,6 +24,7 @@ app.all('*', function (req, res, next) {
         next();
     }
 }); 
+app.use(cookieParser())
 // 解析自定义的 JSON
 app.use(bodyParser.json({
     type: 'application/*+json'
@@ -83,30 +85,11 @@ app.get('/uselist', function (req,res) {
     wxChat.uselist(req,res)
 })
 app.post('/gitpush', function (req,res) {
-    var data = '';
-    req.on('data', function (chuck) {
-        data += chuck;
-    })
-    req.on('end', function () {
-         const hmac = crypto.createHmac('sha1', 'weixin');
-         const ourSignature = `sha1=${hmac.update(data).digest('hex')}`;
-         console.log(ourSignature, req.headers['x-hub-signature']);
-        if (!!req.headers['x-hub-signature'] && req.headers['x-hub-signature'] == ourSignature) {
-           var cmdStr = 'git pull origin master && npm i';
-            console.log('正在拉取代码');
-            exec(cmdStr, function (error, stdout, stderr) {
-                console.log(stdout);
-                console.log(stderr);
-
-            })
-           res.send('校验通过');
-
-        }else{
-            console.log('非法请求')
-        }
-            
-    });
-    
+    webhook(req,res)
+})
+// 暂定为媒体流
+app.get('/video', function (req,res){
+    video_api(req,res)
 })
 
 // 关注后的规则
@@ -137,9 +120,7 @@ wx_boot.watch(app, {
 
 // 当有用户连接进来时
 io.on('connection', function (socket) {
-    console.log(socket)
     console.log('a user connected');
-
     // 发送给客户端在线人数
     io.emit('connected', ++onlineCount);
 
