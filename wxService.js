@@ -24,6 +24,7 @@ app.all('*', function (req, res, next) {
         next();
     }
 }); 
+app.use(express.static(__dirname));
 app.use(cookieParser())
 // 解析自定义的 JSON
 app.use(bodyParser.json({
