@@ -3,10 +3,10 @@ var path = require('path');
 module.exports = function (req,res) {
     let name = req.query.name;
     let type = req.query.type;
-    let path = path.resolve(__dirname + `../assist/${name}.${type}`);
-    if (!name || !type || !fs.existsSync(path)) return;
+    let vpath = path.resolve(__dirname + `../assist/${name}.${type}`);
+    if (!name || !type || !fs.existsSync(vpath)) return;
    
-    let stat = fs.statSync(path);
+    let stat = fs.statSync(vpath);
     let fileSize = stat.size;
     let range = req.headers.range;
     if (range) {
@@ -18,7 +18,7 @@ module.exports = function (req,res) {
         end = end > fileSize - 1 ? fileSize - 1 : end;
 
         let chunksize = (end - start) + 1;
-        let file = fs.createReadStream(path, {
+        let file = fs.createReadStream(vpath, {
             start,
             end
         });
@@ -36,6 +36,6 @@ module.exports = function (req,res) {
             'Content-Type': 'video/mp4',
         };
         res.writeHead(200, head);
-        fs.createReadStream(path).pipe(res);
+        fs.createReadStream(vpath).pipe(res);
     }
 }
