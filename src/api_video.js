@@ -4,7 +4,7 @@ module.exports = function (req,res) {
     let name = req.query.name;
     let type = req.query.type;
     console.log('params', req.query)
-    let vpath = path.resolve(__dirname + `../assist/${name}.${type}`);
+    let vpath = path.resolve(__dirname + `/../assist/${name}.${type}`);
     console.log('路径', vpath);
     if (!name || !type || !fs.existsSync(vpath)) return;
    
