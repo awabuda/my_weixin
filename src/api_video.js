@@ -11,9 +11,6 @@ module.exports = function (req,res) {
     let stat = fs.statSync(vpath);
     let fileSize = stat.size;
     let range = req.headers.range;
-    console.log('stat-------',stat);
-    console.log('fileSize---------', fileSize)
-    console.log('range-------', range);
     try{
         if (range) {
             let parts = range.replace(/bytes=/, "").split("-");
